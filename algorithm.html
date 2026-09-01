@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithm Detail — SortLab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <div class="bgfx-layer" id="bgfxLayer"></div>
+  <div class="page-transition-overlay" id="ptOverlay"></div>
+
+  <header class="site-header">
+    <div class="logo"><span class="mark">S</span> SortLab</div>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span class="sep">/</span>
+      <a href="algorithms.html">Algorithms</a><span class="sep">/</span>
+      <span class="current" id="crumbName">…</span>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="algorithms.html">Algorithms</a>
+    </nav>
+  </header>
+
+  <main class="page page-narrow" id="content">
+    <!-- filled by script -->
+  </main>
+
+  <footer class="site-footer">
+    <span>SortLab · Built with HTML / CSS / vanilla JS</span>
+    <span id="footTag">—</span>
+  </footer>
+
+<script src="assets/data.js"></script>
+<script>
+  function getAlgoSlug(){
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('algo');
+    return (slug && ALGO_DATA[slug]) ? slug : 'bubble';
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const slug = getAlgoSlug();
+    const algo = ALGO_DATA[slug];
+    document.title = `${algo.name} — SortLab`;
+    document.getElementById('crumbName').textContent = algo.name;
+    document.getElementById('footTag').textContent = algo.name;
+
+    const idx = ALGO_LIST.indexOf(slug);
+    const prevSlug = ALGO_LIST[(idx - 1 + ALGO_LIST.length) % ALGO_LIST.length];
+    const nextSlug = ALGO_LIST[(idx + 1) % ALGO_LIST.length];
+
+    const howStepsHtml = algo.howItWorks.map((step, i) => `
+      <li>
+        <span class="num">${i+1}</span>
+        <span class="text">${step}</span>
+      </li>
+    `).join('');
+
+    const derivOrder = ['best','avg','worst'];
+    const deriv = algo.complexityDerivation || {};
+    const derivHtml = derivOrder.map(k => {
+      const d = deriv[k];
+      if (!d) return '';
+      return `
+        <div class="deriv-block">
+          <div class="deriv-label">${escapeHtml(d.label)}</div>
+          <div class="deriv-lines">${d.lines.map(escapeHtml).join('\n')}</div>
+          <div class="deriv-result">${escapeHtml(d.result)}</div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('content').innerHTML = `
+      <div class="detail-hero">
+        <div>
+          <span class="pill">0${idx+1} / 06</span>
+          <h1 style="margin-top:12px;">${algo.name}</h1>
+          <p class="tagline">${algo.tagline}</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="algorithm.html?algo=${prevSlug}" class="btn btn-outline btn-sm">← ${ALGO_DATA[prevSlug].name}</a>
+          <a href="algorithm.html?algo=${nextSlug}" class="btn btn-outline btn-sm">${ALGO_DATA[nextSlug].name} →</a>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="label">Overview</div>
+        <div class="blueprint-panel" style="padding:22px 24px;">
+          <p style="color:var(--ink); font-size:15px;">${algo.description}</p>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="label">How It Works</div>
+        <ul class="how-steps">${howStepsHtml}</ul>
+      </div>
+
+      <div class="section-block">
+        <div class="label">Pseudocode</div>
+        <div class="pseudocode">${algo.pseudocode.split('\n').map((line,i)=>`<span class="ln">${String(i+1).padStart(2,'0')}</span>${escapeHtml(line)}`).join('\n')}</div>
+      </div>
+
+      <div class="section-block">
+        <div class="label">Time Complexity — Step by Step</div>
+        <div class="deriv-grid">${derivHtml}</div>
+      </div>
+
+      <div class="detail-cta">
+        <h2>See it in motion</h2>
+        <p>Watch every comparison and swap happen live, one step at a time.</p>
+        <a href="visualizer.html?algo=${slug}" class="btn btn-primary">Visualize ${algo.name} →</a>
+      </div>
+    `;
+  });
+
+  function escapeHtml(str){
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+
+<script src="assets/tunnelfx.js"></script>
+<script src="assets/bgfx.js"></script>
+<script src="assets/transitions.js"></script>
+</body>
+</html>

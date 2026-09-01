@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sorting Algorithm Visualizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('psText').textContent = PROJECT_INFO.problemStatement;
+    document.getElementById('vStudent').textContent = PROJECT_INFO.studentName;
+    document.getElementById('vFaculty').textContent = PROJECT_INFO.facultyName;
+    document.getElementById('vSubject').textContent = PROJECT_INFO.subject;
+    document.getElementById('vInstitution').textContent = PROJECT_INFO.institution;
+  });
+</script>
+</head>
+<body>
+
+  <div class="bgfx-layer" id="bgfxLayer"></div>
+  <div class="page-transition-overlay" id="ptOverlay"></div>
+
+  <header class="site-header">
+    <div></div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="algorithms.html">Algorithms</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="cover-hero">
+      <div class="cover-eyebrow">DAA Lab Project</div>
+      <h1 class="cover-title">Sorting Algorithm<br><span class="accent">Visualizer</span></h1>
+      <p class="cover-sub">An interactive web application that visualizes how classical sorting algorithms compare, swap, and rearrange data — one step at a time.</p>
+      <div class="cover-actions">
+        <a href="algorithms.html" class="btn btn-primary">Explore the Algorithms →</a>
+      </div>
+
+      <div class="info-grid">
+        <div class="blueprint-panel info-card">
+          <div class="label">Presented By</div>
+          <div class="value" id="vStudent">—</div>
+        </div>
+        <div class="blueprint-panel info-card">
+          <div class="label">Guided By</div>
+          <div class="value" id="vFaculty">—</div>
+        </div>
+        <div class="blueprint-panel info-card">
+          <div class="label">Subject</div>
+          <div class="value" id="vSubject">—</div>
+        </div>
+        <div class="blueprint-panel info-card">
+          <div class="label">Institution</div>
+          <div class="value" id="vInstitution">—</div>
+        </div>
+      </div>
+
+      <div class="blueprint-panel statement-panel">
+        <div class="label">Problem Statement</div>
+        <p id="psText">Loading…</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>SortLab · Built with HTML / CSS / vanilla JS</span>
+    <span>Home</span>
+  </footer>
+
+  <!-- ---------------- SortLab assistant (rule-based, client-side chatbot) ---------------- -->
+  <button class="chat-fab" id="chatFab" aria-label="Open SortLab assistant">💬</button>
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <div>
+        <div class="title">SortLab Assistant</div>
+        <div class="sub">ask about any algorithm</div>
+      </div>
+      <button class="chat-close" id="chatClose" aria-label="Close">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-suggestions" id="chatSuggestions"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Ask a question or type an algorithm name…" autocomplete="off">
+      <button id="chatSend">Send</button>
+    </div>
+  </div>
+
+  <script src="assets/chatbot.js"></script>
+  <script src="assets/tunnelfx.js"></script>
+<script src="assets/bgfx.js"></script>
+  <script src="assets/transitions.js"></script>
+</body>
+</html>
