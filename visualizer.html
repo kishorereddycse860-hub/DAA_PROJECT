@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visualize — SortLab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <div class="bgfx-layer" id="bgfxLayer"></div>
+  <div class="page-transition-overlay" id="ptOverlay"></div>
+
+  <header class="site-header">
+    <div class="logo"><span class="mark">S</span> SortLab</div>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span class="sep">/</span>
+      <a href="algorithms.html">Algorithms</a><span class="sep">/</span>
+      <a href="#" id="crumbAlgoLink">…</a><span class="sep">/</span>
+      <span class="current">Visualize</span>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="algorithms.html">Algorithms</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-heading">
+      <h1 id="pageTitle">Visualizing…</h1>
+      <p id="pageTagline">—</p>
+    </div>
+
+    <div class="viz-grid">
+
+      <!-- MAIN COLUMN -->
+      <div>
+        <div class="viz-toolbar">
+          <select class="viz-select" id="algoSelect"></select>
+          <button class="btn btn-outline btn-sm" id="generateBtn">↻ New Array</button>
+          <button class="btn btn-primary btn-sm" id="playBtn">▶ Play</button>
+          <button class="btn btn-outline btn-sm" id="stepBackBtn">← Previous</button>
+          <button class="btn btn-outline btn-sm" id="stepFwdBtn">Next →</button>
+          <button class="btn btn-ghost btn-sm" id="resetBtn">Reset</button>
+
+          <div class="slider-group">
+            <label for="sizeSlider">Size</label>
+            <input type="range" id="sizeSlider" min="8" max="60" value="28">
+          </div>
+          <div class="slider-group">
+            <label for="speedSlider">Speed</label>
+            <input type="range" id="speedSlider" min="1" max="10" value="6">
+          </div>
+        </div>
+
+        <div class="custom-input-row">
+          <input type="text" id="customArrayInput" placeholder="Enter numbers, e.g. 34, 7, 23, 90, 12, 56" autocomplete="off">
+          <button class="btn btn-outline btn-sm" id="useCustomBtn">Use This Array</button>
+          <span class="input-hint" id="inputHint">2–60 numbers, comma or space separated</span>
+        </div>
+
+        <div class="blueprint-panel viz-frame viz-3d">
+          <div class="array-boxes" id="arrayBoxes"></div>
+          <div class="legend">
+            <div class="legend-item"><span class="swatch" style="background:#3A4568"></span>unsorted</div>
+            <div class="legend-item"><span class="swatch" style="background:var(--amber)"></span>comparing</div>
+            <div class="legend-item"><span class="swatch" style="background:var(--red-bar)"></span>swapping</div>
+            <div class="legend-item"><span class="swatch" style="background:var(--violet-bar)"></span>reference / pivot</div>
+            <div class="legend-item"><span class="swatch" style="background:var(--green)"></span>sorted</div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="blueprint-panel stat-box">
+            <div class="stat-label">Comparisons</div>
+            <div class="stat-value" id="statCompare">0</div>
+          </div>
+          <div class="blueprint-panel stat-box">
+            <div class="stat-label">Swaps / Writes</div>
+            <div class="stat-value" id="statSwap">0</div>
+          </div>
+          <div class="blueprint-panel stat-box">
+            <div class="stat-label">Step</div>
+            <div class="stat-value" id="statStep" style="font-size:16px;">0 / 0</div>
+          </div>
+          <div class="blueprint-panel stat-box">
+            <div class="stat-label">Status</div>
+            <div class="stat-value" id="statStatus" style="color:var(--slate); font-size:14px;">idle</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDE COLUMN -->
+      <div class="side-stack">
+        <div>
+          <div class="section-label">Live Log</div>
+          <div class="console" id="consoleLog"></div>
+        </div>
+
+        <div class="pass-console-wrap">
+          <div class="section-label">Pass-by-Pass Steps</div>
+          <div class="pass-console" id="passLog"></div>
+        </div>
+
+        <div class="blueprint-panel vars-box" id="varsBox">
+          <div class="section-label" style="margin-bottom:8px;">Variables</div>
+          <div class="vars-grid" id="varsGrid"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="code-section-full">
+      <div class="section-label code-label-row">
+        <span>C++ Code · step-by-step</span>
+        <button class="code-expand-btn" id="codeExpandBtn" type="button">⛶ Full screen</button>
+      </div>
+      <div class="code-panel" id="codePanel"></div>
+    </div>
+  </main>
+
+  <!-- ---------------- full-screen C++ code overlay ---------------- -->
+  <div class="code-modal-backdrop" id="codeModalBackdrop">
+    <div class="code-modal">
+      <div class="code-modal-header">
+        <span id="codeModalTitle">C++ Code</span>
+        <button class="code-modal-close" id="codeModalClose" type="button">✕ Close</button>
+      </div>
+      <div class="code-panel code-panel-large" id="codePanelLarge"></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <span>SortLab · Built with HTML / CSS / vanilla JS</span>
+    <span id="clock">ready</span>
+  </footer>
+
+<script src="assets/data.js"></script>
+<script src="assets/sorter.js"></script>
+<script src="assets/codeviz.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  function getAlgoSlugFromUrl(){
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('algo');
+    return (slug && ALGO_DATA[slug]) ? slug : 'bubble';
+  }
+
+  let currentAlgo = getAlgoSlugFromUrl();
+  let array = [];
+  let baseArraySnapshot = [];
+  let steps = [];
+  let stepIndex = 0;
+  let playing = false;
+  let playTimer = null;
+
+  const els = {};
+  ['arrayBoxes','algoSelect','generateBtn','playBtn','stepBackBtn','stepFwdBtn','resetBtn',
+   'sizeSlider','speedSlider','statCompare','statSwap','statStep','statStatus',
+   'consoleLog','codePanel','codePanelLarge','codeExpandBtn','codeModalBackdrop','codeModalClose','codeModalTitle',
+   'varsGrid','clock','customArrayInput','useCustomBtn','inputHint',
+   'pageTitle','pageTagline','crumbAlgoLink','passLog'].forEach(id => els[id] = document.getElementById(id));
+
+  function populateAlgoSelect(){
+    els.algoSelect.innerHTML = ALGO_LIST.map(slug =>
+      `<option value="${slug}" ${slug===currentAlgo?'selected':''}>${ALGO_DATA[slug].name}</option>`
+    ).join('');
+  }
+
+  function refreshHeaderForAlgo(){
+    const d = ALGO_DATA[currentAlgo];
+    els.pageTitle.textContent = `Visualizing: ${d.name}`;
+    els.pageTagline.textContent = d.tagline;
+    els.crumbAlgoLink.textContent = d.name;
+    els.crumbAlgoLink.href = `algorithm.html?algo=${currentAlgo}`;
+    document.title = `Visualize ${d.name} — SortLab`;
+    els.codeModalTitle.textContent = `${d.name} — C++ Code`;
+    renderCodePanel(els.codePanel, currentAlgo);
+    renderCodePanel(els.codePanelLarge, currentAlgo);
+  }
+
+  /* -------- variables mini panel (PythonTutor-style state view) -------- */
+  function renderVars(step){
+    if (!step){ els.varsGrid.innerHTML = `<div class="var-empty">— idle —</div>`; return; }
+    const rows = [];
+    if (step.type === 'compare' || step.type === 'swap'){
+      rows.push(['i', step.i]); rows.push(['j', step.j]);
+    } else if (step.type === 'overwrite'){
+      rows.push(['k', step.i]); rows.push(['value', step.value]);
+    } else if (step.type === 'pivot'){
+      rows.push(['index', step.i]);
+    } else if (step.type === 'sorted'){
+      rows.push(['locked idx', step.i]);
+    }
+    els.varsGrid.innerHTML = rows.length
+      ? rows.map(([k,v]) => `<div class="var-row"><span class="var-name">${k}</span><span class="var-val">${v}</span></div>`).join('')
+      : `<div class="var-empty">— idle —</div>`;
+  }
+
+  // ---------------- array generation ----------------
+  function generateArray(){
+    const size = parseInt(els.sizeSlider.value, 10);
+    array = Array.from({length:size}, () => Math.floor(Math.random()*95)+5);
+    baseArraySnapshot = array.slice();
+    rebuildStepsAndReset();
+    logLine({kind:'sys', tag:'SYS', text:`generated new array of size ${size}`});
+  }
+
+  function rebuildStepsAndReset(){
+    pause();
+    steps = recordSortSteps(baseArraySnapshot, currentAlgo);
+    renderPassLog();
+    goToStep(0, {clearLog:true});
+  }
+
+  // ---------------- pass-by-pass step log (stacked array snapshots) ----------------
+  // A "pass" boundary is drawn right after a run of consecutive 'sorted'
+  // events — for Bubble/Selection/Insertion that lines up with a literal
+  // pass; for Merge/Quick/Heap it lines up with a natural phase boundary.
+  function buildPassGroups(){
+    const groups = [];
+    let current = [];
+    for (let i = 0; i < steps.length; i++){
+      current.push({ step: steps[i], index: i });
+      const isSorted = steps[i].type === 'sorted';
+      const nextIsSorted = (i + 1 < steps.length) && steps[i + 1].type === 'sorted';
+      if (isSorted && !nextIsSorted){
+        groups.push(current);
+        current = [];
+      }
+    }
+    if (current.length) groups.push(current);
+    return groups;
+  }
+
+  // walk every step once, recording the full array + highlight state AFTER
+  // each step, so the pass log can show a snapshot at any point in history
+  function computeSnapshots(){
+    const snapshots = [];
+    const working = baseArraySnapshot.slice();
+    const sortedSet = new Set();
+    for (let i = 0; i < steps.length; i++){
+      const step = steps[i];
+      let highlight = {};
+      if (step.type === 'compare'){
+        highlight = { compare:[step.i, step.j] };
+      } else if (step.type === 'swap'){
+        const tmp = working[step.i]; working[step.i] = working[step.j]; working[step.j] = tmp;
+        highlight = { swap:[step.i, step.j] };
+      } else if (step.type === 'overwrite'){
+        working[step.i] = step.value;
+        highlight = { swap:[step.i] };
+      } else if (step.type === 'sorted'){
+        sortedSet.add(step.i);
+      } else if (step.type === 'pivot'){
+        highlight = { pivot:[step.i] };
+      }
+      snapshots.push({ array: working.slice(), highlight, sortedSet: new Set(sortedSet) });
+    }
+    return snapshots;
+  }
+
+  function miniBoxesHtml(snapshot){
+    const { array, highlight, sortedSet } = snapshot;
+    return array.map((val, i) => {
+      const cls = ['mini-box'];
+      if (highlight.compare && highlight.compare.includes(i)) cls.push('compare');
+      if (highlight.swap && highlight.swap.includes(i)) cls.push('swap');
+      if (highlight.pivot && highlight.pivot.includes(i)) cls.push('pivot');
+      if (sortedSet.has(i)) cls.push('sorted');
+      return `<span class="${cls.join(' ')}">${val}</span>`;
+    }).join('');
+  }
+
+  function renderPassLog(){
+    if (!els.passLog) return;
+    if (!steps.length){
+      els.passLog.innerHTML = `<div class="pass-log-empty">— no steps yet —</div>`;
+      return;
+    }
+    const snapshots = computeSnapshots();
+    const groups = buildPassGroups();
+
+    els.passLog.innerHTML = groups.map((group, gi) => {
+      const rows = [];
+      group.forEach(({ step, index }) => {
+        if (step.type === 'swap' || step.type === 'overwrite'){
+          const snap = snapshots[index];
+          const label = step.type === 'swap'
+            ? `swapped arr[${step.i}] \u2194 arr[${step.j}]`
+            : `arr[${step.i}] = ${step.value}`;
+          rows.push(`<div class="pass-row" data-step-index="${index}">
+              <div class="pass-row-label">${label}</div>
+              <div class="mini-array">${miniBoxesHtml(snap)}</div>
+            </div>`);
+        }
+      });
+      if (!rows.length){
+        rows.push(`<div class="pass-row-note">no swaps this pass — already in order</div>`);
+      }
+      const lastIdx = group[group.length - 1].index;
+      const finalSnap = snapshots[lastIdx];
+      rows.push(`<div class="pass-row pass-row-final" data-step-index="${lastIdx}">
+          <div class="pass-row-label">end of Pass ${gi + 1} — next element locked in place</div>
+          <div class="mini-array">${miniBoxesHtml(finalSnap)}</div>
+        </div>`);
+
+      return `<div class="pass-divider">Pass ${gi + 1}</div>${rows.join('')}`;
+    }).join('');
+  }
+
+  function highlightPassLog(n){
+    if (!els.passLog) return;
+    const rows = els.passLog.querySelectorAll('.pass-row[data-step-index]');
+    let currentRow = null, bestIdx = -1;
+    rows.forEach(row => {
+      const idx = parseInt(row.dataset.stepIndex, 10);
+      row.classList.remove('done', 'current');
+      if (idx <= n - 1){
+        row.classList.add('done');
+        if (idx > bestIdx){ bestIdx = idx; currentRow = row; }
+      }
+    });
+    if (currentRow){
+      currentRow.classList.remove('done');
+      currentRow.classList.add('current');
+      currentRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
+  // ---------------- rendering: index-box array (with FLIP swap animation) ----------------
+  function renderBoxes(arr, highlight){
+    highlight = highlight || {};
+    const container = els.arrayBoxes;
+    const doSwapAnim = highlight.swap && highlight.swap.length === 2;
+
+    // capture old on-screen positions before we rebuild, so a swap can
+    // animate FROM its previous slot TO its new one (FLIP technique)
+    const oldRects = {};
+    if (doSwapAnim){
+      container.querySelectorAll('.array-box').forEach((box) => {
+        oldRects[box.dataset.i] = box.getBoundingClientRect();
+      });
+    }
+
+    container.innerHTML = '';
+    const sortedSet = highlight.sortedSet || new Set();
+    arr.forEach((val, i) => {
+      const box = document.createElement('div');
+      box.className = 'array-box';
+      box.dataset.i = i;
+      if (highlight.compare && highlight.compare.includes(i)) box.classList.add('compare');
+      if (highlight.swap && highlight.swap.includes(i)) box.classList.add('swap');
+      if (highlight.pivot && highlight.pivot.includes(i)) box.classList.add('pivot');
+      if (sortedSet.has(i)) box.classList.add('sorted');
+      box.innerHTML = `<span class="idx">${i}</span><span class="val">${val}</span>`;
+      container.appendChild(box);
+    });
+
+    if (doSwapAnim){
+      const [ia, ib] = highlight.swap;
+      const boxA = container.querySelector(`.array-box[data-i="${ia}"]`);
+      const boxB = container.querySelector(`.array-box[data-i="${ib}"]`);
+      if (boxA && boxB && oldRects[ia] && oldRects[ib]){
+        const newRectA = boxA.getBoundingClientRect();
+        const newRectB = boxB.getBoundingClientRect();
+        const dxA = oldRects[ib].left - newRectA.left;
+        const dxB = oldRects[ia].left - newRectB.left;
+        [[boxA, dxA], [boxB, dxB]].forEach(([box, dx]) => {
+          box.style.transition = 'none';
+          box.style.transform = `translateX(${dx}px)`;
+          void box.offsetWidth; // force reflow to lock in the starting position
+          box.style.transition = '';
+          requestAnimationFrame(() => { box.style.transform = ''; });
+        });
+
+        // brief "swap direction" indicator between the two boxes
+        const midX = (newRectA.left + newRectB.left) / 2 + newRectA.width / 2;
+        const containerRect = container.getBoundingClientRect();
+        const indicator = document.createElement('div');
+        indicator.className = 'swap-indicator';
+        indicator.textContent = '⇄';
+        indicator.style.left = (midX - containerRect.left) + 'px';
+        indicator.style.top = '0px';
+        container.appendChild(indicator);
+        setTimeout(() => indicator.remove(), 600);
+      }
+    }
+  }
+
+  function updateStats(comparisons, swaps){
+    els.statCompare.textContent = comparisons;
+    els.statSwap.textContent = swaps;
+    els.statStep.textContent = `${stepIndex} / ${steps.length}`;
+  }
+
+  function setStatus(text){ els.statStatus.textContent = text; }
+
+  function clearConsole(){ els.consoleLog.innerHTML = ''; }
+
+  function logLine(entry){
+    const div = document.createElement('div');
+    div.className = 'console-line ' + (entry.kind || '');
+    div.innerHTML = entry.tag ? `<span class="tag">[${entry.tag}]</span> ${entry.text}` : entry.text;
+    els.consoleLog.appendChild(div);
+    els.consoleLog.scrollTop = els.consoleLog.scrollHeight;
+  }
+
+  // ---------------- core navigation: replay from scratch to step N ----------------
+  // This makes "Previous" trivially correct: we just replay history up to N-1.
+  function goToStep(n){
+    n = Math.max(0, Math.min(steps.length, n));
+    pause();
+
+    const workingArr = baseArraySnapshot.slice();
+    const sortedSet = new Set();
+    let comparisons = 0, swaps = 0;
+    let lastHighlight = {};
+
+    clearConsole();
+
+    for (let i=0;i<n;i++){
+      const step = steps[i];
+      if (step.type === 'compare'){
+        comparisons++;
+        lastHighlight = { compare:[step.i, step.j] };
+      } else if (step.type === 'swap'){
+        swaps++;
+        const tmp = workingArr[step.i]; workingArr[step.i] = workingArr[step.j]; workingArr[step.j] = tmp;
+        lastHighlight = { swap:[step.i, step.j] };
+      } else if (step.type === 'overwrite'){
+        swaps++;
+        workingArr[step.i] = step.value;
+        lastHighlight = { swap:[step.i] };
+      } else if (step.type === 'sorted'){
+        sortedSet.add(step.i);
+        lastHighlight = {};
+      } else if (step.type === 'pivot'){
+        lastHighlight = { pivot:[step.i] };
+      }
+      const logEntry = stepLogLine(step);
+      logLine(logEntry);
+    }
+
+    array = workingArr;
+    stepIndex = n;
+    lastHighlight.sortedSet = sortedSet;
+    renderBoxes(array, lastHighlight);
+    updateStats(comparisons, swaps);
+
+    const lastStep = n > 0 ? steps[n-1] : null;
+    highlightCodeLines(els.codePanel, currentAlgo, lastStep ? lastStep.type : null);
+    highlightCodeLines(els.codePanelLarge, currentAlgo, lastStep ? lastStep.type : null);
+    renderVars(lastStep);
+    highlightPassLog(n);
+
+    if (n >= steps.length){
+      setStatus('sorted ✓');
+      const fullSorted = new Set(array.map((_, i) => i));
+      renderBoxes(array, { sortedSet: fullSorted });
+    } else if (n === 0){
+      setStatus('idle');
+    } else {
+      setStatus(playing ? 'running…' : 'paused');
+    }
+  }
+
+  function stepForward(){ goToStep(stepIndex + 1); }
+  function stepBackward(){ goToStep(stepIndex - 1); }
+
+  function play(){
+    if (playing || stepIndex >= steps.length) return;
+    playing = true;
+    els.playBtn.textContent = '⏸ Pause';
+    setStatus('running…');
+    tick();
+  }
+
+  function tick(){
+    if (!playing) return;
+    if (stepIndex >= steps.length){ pause(); return; }
+    stepForward();
+    if (stepIndex >= steps.length){ pause(); return; }
+    const speed = parseInt(els.speedSlider.value, 10);
+    const delay = 620 - speed * 55;
+    playTimer = setTimeout(tick, Math.max(30, delay));
+  }
+
+  function pause(){
+    playing = false;
+    els.playBtn.textContent = '▶ Play';
+    if (playTimer) clearTimeout(playTimer);
+    if (stepIndex > 0 && stepIndex < steps.length) setStatus('paused');
+  }
+
+  // ---------------- custom array input ----------------
+  function showInputHint(text, isError){
+    els.inputHint.textContent = text;
+    els.inputHint.classList.toggle('error', isError);
+    els.customArrayInput.classList.toggle('input-error', isError);
+  }
+
+  function applyCustomArray(){
+    const raw = els.customArrayInput.value.trim();
+    if (!raw){ showInputHint('2–60 numbers, comma or space separated', false); return; }
+    const parts = raw.split(/[\s,]+/).filter(Boolean);
+    const nums = parts.map(p => Number(p));
+
+    if (parts.length < 2 || parts.length > 60){ showInputHint('Enter between 2 and 60 numbers', true); return; }
+    if (nums.some(n => Number.isNaN(n) || !Number.isFinite(n))){ showInputHint('Only numbers, comma or space separated please', true); return; }
+    if (nums.some(n => n < 0 || n > 999)){ showInputHint('Keep numbers between 0 and 999', true); return; }
+
+    baseArraySnapshot = nums.slice();
+    els.sizeSlider.value = Math.min(60, Math.max(8, nums.length));
+    rebuildStepsAndReset();
+    logLine({kind:'sys', tag:'SYS', text:`custom array loaded (${nums.length} elements)`});
+    showInputHint('2–60 numbers, comma or space separated', false);
+  }
+
+  // ---------------- UI wiring ----------------
+  els.generateBtn.addEventListener('click', generateArray);
+  els.playBtn.addEventListener('click', () => { playing ? pause() : play(); });
+  els.stepFwdBtn.addEventListener('click', () => { pause(); stepForward(); });
+  els.stepBackBtn.addEventListener('click', () => { pause(); stepBackward(); });
+  els.resetBtn.addEventListener('click', () => { goToStep(0); logLine({kind:'sys', tag:'SYS', text:'playback reset'}); });
+  els.sizeSlider.addEventListener('change', generateArray);
+  els.useCustomBtn.addEventListener('click', applyCustomArray);
+  els.customArrayInput.addEventListener('keydown', e => { if (e.key === 'Enter') applyCustomArray(); });
+
+  els.algoSelect.addEventListener('change', () => {
+    currentAlgo = els.algoSelect.value;
+    const url = new URL(window.location);
+    url.searchParams.set('algo', currentAlgo);
+    window.history.replaceState({}, '', url);
+    refreshHeaderForAlgo();
+    rebuildStepsAndReset();
+    logLine({kind:'sys', tag:'SYS', text:`switched algorithm to ${ALGO_DATA[currentAlgo].name}`});
+  });
+
+  els.codeExpandBtn.addEventListener('click', () => {
+    els.codeModalBackdrop.classList.add('open');
+    const activeLarge = els.codePanelLarge.querySelector('.code-line.active');
+    if (activeLarge) activeLarge.scrollIntoView({ block:'center' });
+  });
+  els.codeModalClose.addEventListener('click', () => els.codeModalBackdrop.classList.remove('open'));
+  els.codeModalBackdrop.addEventListener('click', (e) => {
+    if (e.target === els.codeModalBackdrop) els.codeModalBackdrop.classList.remove('open');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') els.codeModalBackdrop.classList.remove('open');
+  });
+
+  function tickClock(){ els.clock.textContent = new Date().toLocaleTimeString(); }
+  setInterval(tickClock, 1000);
+  tickClock();
+
+  // ---------------- init ----------------
+  window.addEventListener('DOMContentLoaded', () => {
+    populateAlgoSelect();
+    refreshHeaderForAlgo();
+    generateArray();
+  });
+
+})();
+</script>
+
+<script src="assets/tunnelfx.js"></script>
+<script src="assets/bgfx.js"></script>
+<script src="assets/transitions.js"></script>
+</body>
+</html>
