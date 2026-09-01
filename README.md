@@ -2,7 +2,7 @@
 
 An interactive web application that visualizes how classical sorting algorithms compare, swap, and rearrange data — one step at a time. Built as a DAA (Design and Analysis of Algorithms) lab project to make abstract time-complexity differences visually observable.
 
-**Live Demo:** [https://kishorereddycse860-hub.github.io/sorting-visualizer-DAA/](https://kishorereddycse860-hub.github.io/sorting-visualizer-DAA/)
+**Live Demo:** [[https://kishorereddycse860-hub.github.io/sorting-visualizer-DAA/](https://kishorereddycse860-hub.github.io/sorting-visualizer-DAA/)](https://kishorereddycse860-hub.github.io/DAA_PROJECT/)
 
 ---
 
